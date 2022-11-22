@@ -1221,8 +1221,6 @@ sub Dayprofile_getHexLastTime($)
 
 =begin html
 
-<a name="Dayprofile"></a>
-<p><a name="Dayprofile"></a></p>
 <p><a name="Dayprofile"></a></p>
 <h3>Dayprofile</h3>
 <p><u><strong>Dayprofile - storage buffer for events</strong></u></p>
@@ -1275,19 +1273,8 @@ sub Dayprofile_getHexLastTime($)
 <ul>
 <ul>
 <ul>
-<li>actionQueue - information about the entries in the action queue</li>
-<li>aggregates-* - readings of the /api/meters/aggregates response</li>
-<li>batteryLevel - battery level in percent</li>
-<li>batteryPower - battery capacity in kWh</li>
-<li>powerwalls-* - readings of the /api/powerwalls response</li>
-<li>registration-* - readings of the /api/customer/registration response</li>
-<li>siteinfo-* - readings of the /api/site_info response</li>
-<li>sitemaster-* - readings of the /api/sitemaster response</li>
-<li>state - information about internel modul processes</li>
-<li>status-* - readings of the /api/status response</li>
-<li>statussoe-* - readings of the /api/system_status/soe response</li>
-<li>setPassword - write password encrypted to password file</li>
-<li>removePassword - remove password from password file</li>
+<li>1</li>
+<li>2</li>
 </ul>
 </ul>
 </ul>
