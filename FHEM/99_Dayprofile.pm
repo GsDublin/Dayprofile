@@ -981,15 +981,26 @@ sub Dayprofile_getProtocol($)
     ##my $protocol = "${secondsBit}:${p_binstring}";
     my $protocol = "";
     if ($secondsBit <= 0) { return "secondsBit invalid";}
+    my $old_val = "";
+    my $an = "";
+    my $aus = "";
     
     for (my $i = 0; $i < length($p_binstring); $i++) {
-        if (substr($p_binstring, $i, 1) eq "1") {
+        my $act_val = substr($p_binstring, $i, 1);
+        if ($old_val ne $act_val) {
+            $old_val = $act_val;
             my $sss = Dayprofile_calculateSSS($i, $secondsBit);
             my $HHMMSS = Dayprofile_calculateHHMMSSBitnumber($sss);
             if ( $secondsBit > 60 ) {
                 $HHMMSS = substr($HHMMSS, 0, 5);
-            } 
-            $protocol .= "${HHMMSS}\n";
+            }
+            if ($act_val eq "1") {$an = $HHMMSS; $aus = "";}
+            if ($act_val eq "0") {$aus = $HHMMSS;}
+        }
+        if ($an ne "" and $aus ne "") {
+            $protocol .= "${an}-${aus}\n";
+            $an = "";
+            $aus = "";
         }
     }
     
@@ -1021,6 +1032,60 @@ sub b2h {
         $index -= $WIDTH;
     } while ($index > (-1 * $WIDTH));
     return $hex;
+}
+
+sub #####################################
+Dayprofile_Html(@)
+{
+  my ($d,$days) = @_;
+  $d = "<none>" if(!$d);
+  $days = 3 unless defined $days;
+  return "$d is not a Dayprofile instance<br>"
+        if(!$defs{$d} || $defs{$d}{TYPE} ne "Dayprofile");
+  ##
+  ##my $uselocal= 0; #AttrVal($d,"localicons",0);
+  ##my $isday;
+  ## if ( exists &isday) {
+  ##    $isday = isday();
+  ## }
+  ## else {
+  ##    $isday = 1; #($hour>6 && $hour<19);
+  ## }
+  ##      
+  ##my $ret = "<table border=0><thead align=center>";
+  ##$ret .= sprintf '<tr><th colspan=9 align=left>%s</th></tr>', $defs{$d}{DEF};
+  ##$ret .= '<tr><th>Tag</th><th>morgens</th><th>tagsueber</th><th>abends</th><th>nachts</th><th>min</th><th>max</th><th>Regen tags</th><th>Frost</th></tr></thead>';
+  ##$ret .= "<tbody align=center>";
+# ##define MyForecast weblink htmlCode { PROPLANTA_Html("ProPlanta_Wetter") }
+  ## for(my $i=0; $i<$days; $i++) {
+  ##    $ret .= sprintf('<tr><td>%s</td><td>%s<br><img src="%s"></td><td>%s<br><img src="%s"></td><td>%s<br><img src="%s"></td><td>%s<br><img src="%s"></td><td>%s°C</td><td>%s°C</td><td>%s %%</td><td>%s</td></tr>',
+  ##        ReadingsVal($d, "fc".$i."_date", ""), 
+  ##        ReadingsVal($d, "fc".$i."_weatherMorning", ""), ReadingsVal($d, "fc".$i."_weatherMorningIcon", ""),
+  ##        ReadingsVal($d, "fc".$i."_weatherDay", ""), ReadingsVal($d, "fc".$i."_weatherDayIcon", ""),
+  ##        ReadingsVal($d, "fc".$i."_weatherEvening", ""), ReadingsVal($d, "fc".$i."_weatherEveningIcon", ""),
+  ##        ReadingsVal($d, "fc".$i."_weatherNight", ""), ReadingsVal($d, "fc".$i."_weatherNightIcon", ""),
+  ##        ReadingsVal($d, "fc".$i."_tempMin", ""), ReadingsVal($d, "fc".$i."_tempMax", ""),
+  ##        ReadingsVal($d, "fc".$i."_chOfRainDay", ""), 
+  ##        ReadingsVal($d, "fc".$i."_frost", "") ? "ja" : "nein"
+  ##       );
+  ## }
+  ### for(my $i=0; $i<=4; $i++) {
+  ##  # $ret .= sprintf('<tr><td>%s</td><td>%s: %s<br>min %s °C max %s °C<br>wind: %s km/h %s<br>precip: %s mm</td></tr>',
+  ##      # WWOIconIMGTag(ReadingsVal($d, "fc${i}_weatherDayIcon", ""),$uselocal,$isday),
+  ##      # ReadingsVal($d, "fc${i}_date", ""),
+  ##      # ReadingsVal($d, "fc${i}_weatherDay", ""),
+  ##      # ReadingsVal($d, "fc${i}_tempMinC", ""), ReadingsVal($d, "fc${i}_tempMaxC", ""),
+  ### }
+  ##
+  ##$ret .= "</tbody></table>";
+
+    my $ret = "<h1>Not implemented yet</h><br>";
+
+    my $binstring = Dayprofile_Hex2Bin($hexstring);
+    $ret .= Dayprofile_getProtocol($binstring);
+    $ret =~ s/\n/<br>/g;
+
+    return $ret;
 }
 
 ###############################################################################################
@@ -1221,6 +1286,7 @@ sub Dayprofile_getHexLastTime($)
 
 =begin html
 
+<a id="Dayprofile"></a>
 <p><a name="Dayprofile"></a></p>
 <h3>Dayprofile</h3>
 <p><u><strong>Dayprofile - storage buffer for events</strong></u></p>
@@ -1255,9 +1321,10 @@ sub Dayprofile_getHexLastTime($)
 21:00 000000000000<br />
 22:00 000000000000<br />
 23:00 000000000000</code></p>
-<p>Protocol:<br /><code>12:25<br />
-12:35<br />
-12:55<br /></code></p>
+<p>Protocol:<br /><code>9:00-9:15<br />
+11:00-12:35<br />
+12:55-13:00<br /></code></p>
+<a id="Dayprofile-define"></a>
 <p><br /><br /><a name="Dayprofile_define"></a><strong>Define</strong></p>
 <p><code>define &lt;name&gt; Dayprofile &lt;pattern_for_ON&gt; [&lt;pattern_for_OFF&gt;]</code><br /><code></code></p>
 <ul>
@@ -1278,6 +1345,7 @@ sub Dayprofile_getHexLastTime($)
 </ul>
 </ul>
 </ul>
+<a id="Dayprofile-get"></a>
 <p><a name="Dayprofile_get"></a><strong>get</strong></p>
 <ul>
 <ul>
@@ -1287,6 +1355,7 @@ sub Dayprofile_getHexLastTime($)
 </ul>
 </ul>
 </ul>
+<a id="Dayprofile-set"></a>
 <p><br /><a name="Dayprofile_set"></a><strong>set</strong></p>
 <ul>
 <ul>
@@ -1298,12 +1367,16 @@ sub Dayprofile_getHexLastTime($)
 <li>update - recalculate all readings</li>
 </ul>
 </ul>
-</ul>
-<p><br /><br /><a name="TeslaPowerwall2ACattribute"></a><strong>Attribute</strong></p>
+</ul> 
+<a id="dayprofile-attr"></a>
+<b>Attribute</b>
 <ul>
 <ul>
+<a id="dayprofile-attr-add_dp"></a>
 <li>add_dp - comma seperated list of additional dp(dayprofile) readings with diffrent resolutzion<br />e.g. 300,900,1200<br />will generate three dp readings with resolution of 300 seconds per bit, 900 s/Bit ...</li>
+<a id="dayprofile-attr-secondsBit"></a>
 <li>secondsBit - seconds per bit for event storage. Default is 300 seconds / Bit means 5 Minute timeframes: 00:00, 00:05, etc...</li>
+<a id="dayprofile-attr-add_protocol"></a>
 <li>add_protocol - adds a reading like "pro" with a protocol list of all events like HH:MM[:SS]\n</li>
 </ul>
 </ul>
